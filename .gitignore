@@ -1,0 +1,5 @@
+*.env
+node-modules/
+app-cache/
+svelte-kit/
+.astro/
