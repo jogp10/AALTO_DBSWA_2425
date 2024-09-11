@@ -22,6 +22,7 @@ package-lock.json
 .netlify/
 .astro/
 env.d.ts
+package-lock.json
 
 # make it easy for people to add project-specific Astro settings that they don't
 # want to share with others (see
