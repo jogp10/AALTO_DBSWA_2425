@@ -8,7 +8,7 @@ export let options = {
 };
 
 export default function () {
-    const url = 'http://localhost:7777/todos';
+    const url = 'http://localhost:7800/todos';
     const res = http.get(url);
 
     // Check the response status

@@ -55,5 +55,18 @@ services:
     expose:
       - 6379
 
+  app-astro:
+    build: app-astro
+    image: app-astro
+    restart: "no"
+    volumes:
+      - ./app-astro/:/app
+      - astro_node_modules:/app/node_modules
+    expose:
+      - 3000
+    depends_on:
+      - redis-api
+
 volumes:
   pg_data:
+  astro_node_modules:

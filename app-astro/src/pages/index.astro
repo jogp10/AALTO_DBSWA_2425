@@ -2,9 +2,13 @@
 export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
+import Hello from "../components/Hello.svelte";
+import InputStatistics from "../components/InputStatistics.svelte";
+import Items from "../components/Items.svelte";
 ---
 
 <Layout heading="Main page" title="Main page">
-  <p>Welcome to the main page.</p>
-  <li><a href="/items/1">Start</a></li>
+  <Hello />
+  <!-- <InputStatistics client:load /> -->
+  <Items client:load />
 </Layout>
