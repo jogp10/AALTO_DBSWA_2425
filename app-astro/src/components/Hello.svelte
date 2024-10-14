@@ -6,4 +6,7 @@
     });
 </script>
     
-<p>Hello Svelte!</p>
+<span class="text-2xl text-gray-700 font-serif">Hello Svelte!</span>
+<div class="container mx-auto p-2">
+  <p>Hello!</p>
+</div>
