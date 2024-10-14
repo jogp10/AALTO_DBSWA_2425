@@ -14,9 +14,13 @@ import Layout from "../layouts/Layout.astro";
 
 const id = Astro.params.id;
 const linkToNext = `/${parseInt(id) + 1}`;
+const linkToBefore = `/${parseInt(id) - 1}`;
 ---
 
 <Layout heading="Items">
   <p>You are at { id }.</p>
-  <li><a href={linkToNext}>Next</a></li>
+  {parseInt(id) < 4 &&
+  <li><a href={linkToNext}>Next</a></li>}
+  {parseInt(id) > 1 &&
+  <li><a href={linkToBefore}>Before</a></li>}
 </Layout>

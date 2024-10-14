@@ -23,6 +23,14 @@
 
         itemsPromise = getItems();
     };
+
+    const deleteItem = async (id) => {
+        await fetch(`/api/todos/${id}`, {
+        method: "DELETE",
+        });
+
+        itemsPromise = getItems();
+    };
 </script>
   
 <h1>Items</h1>
@@ -39,7 +47,10 @@
 {:else}
     <ul>
     {#each items as item}
-        <li>{item.item}</li>
+        <li>
+            {item.item}
+            <button on:click={() => deleteItem(item.id)}>Remove</button>
+        </li>
     {/each}
     </ul>
 {/if}

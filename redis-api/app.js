@@ -3,7 +3,7 @@ import { cacheMethodCalls } from "./util/cacheUtil.js";
 
 const SERVER_ID = crypto.randomUUID();
 
-const cachedTodoService = cacheMethodCalls(todoService, ["addTodo"]);
+const cachedTodoService = cacheMethodCalls(todoService, ["addTodo", "deleteTodo"]);
 
 const handleGetRoot = async (request) => {
   return new Response(`Hello from ${ SERVER_ID }`);
