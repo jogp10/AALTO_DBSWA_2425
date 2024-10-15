@@ -1,0 +1,30 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+.vercel
+.netlify
+_site/
+scripts/smoke/*-main/
+scripts/memory/project/src/pages/
+benchmark/projects/
+benchmark/results/
+test-results/
+*.log
+package-lock.json
+.turbo/
+.eslintcache
+.pnpm-store
+
+# do not commit .env files or any files that end with `.env`
+*.env
+
+.netlify/
+.astro/
+env.d.ts
+package-lock.json
+
+# make it easy for people to add project-specific Astro settings that they don't
+# want to share with others (see
+# https://github.com/withastro/astro/pull/11759#discussion_r1721444711)
+*.code-workspace

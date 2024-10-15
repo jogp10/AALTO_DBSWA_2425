@@ -2,9 +2,11 @@ version: "3.4"
 
 services:
   todo-api:
-    build: todo-api
-    image: todo-api
-    restart: "no"
+    build: 
+      context: todo-api
+      dockerfile: Dockerfile.prod
+    image: todo-api-prod
+    restart: "on-failure"
     volumes:
       - ./todo-api:/app
       - ./app-cache/:/app-cache
@@ -17,7 +19,12 @@ services:
     env_file:
       - project.env
     deploy:
-        replicas: 2
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: "5s"
+        max_attempts: 5
+        window: "30s"
 
   nginx:
     image: nginx:latest
@@ -31,7 +38,7 @@ services:
   database:
     container_name: postgresql_database
     image: postgres:16.1
-    restart: "no"
+    restart: unless-stopped
     env_file:
       - project.env
     ports:
@@ -57,6 +64,8 @@ services:
     volumes:
       - ./flyway/sql/:/flyway/sql
     command: -connectRetries=60 -baselineOnMigrate=true migrate
+    profiles:
+      - migrate
 
   redis:
     image: redis:latest

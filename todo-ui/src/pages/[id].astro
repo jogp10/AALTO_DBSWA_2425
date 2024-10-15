@@ -1,0 +1,26 @@
+---
+export const prerender = true;
+
+export const getStaticPaths = () => {
+  return [
+    { params: { id: '1' } },
+    { params: { id: '2' } },
+    { params: { id: '3' } },
+    { params: { id: '4' } },
+  ];
+}
+
+import Layout from "../layouts/Layout.astro";
+
+const id = Astro.params.id;
+const linkToNext = `/${parseInt(id) + 1}`;
+const linkToBefore = `/${parseInt(id) - 1}`;
+---
+
+<Layout heading="Items">
+  <p>You are at { id }.</p>
+  {parseInt(id) < 4 &&
+  <li><a href={linkToNext}>Next</a></li>}
+  {parseInt(id) > 1 &&
+  <li><a href={linkToBefore}>Before</a></li>}
+</Layout>

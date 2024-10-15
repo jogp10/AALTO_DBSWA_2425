@@ -1,0 +1,34 @@
+---
+export const prerender = true;
+
+import Layout from "../layouts/Layout.astro";
+import Hello from "../components/Hello.svelte";
+import InputStatistics from "../components/InputStatistics.svelte";
+import Items from "../components/Items.svelte";
+import TopBar from "../components/TopBar.svelte";
+import Hero from "../components/Hero.svelte";
+import Card from "../components/Card.svelte";
+import CardCollection from "../components/CardCollection.svelte";
+import ServerSent from "../components/ServerSent.svelte";
+import WebSocket from "../components/WebSocket.svelte";
+---
+
+<Layout heading="Main page" title="Main page">
+  <!-- <TopBar /> -->
+  <!-- <Hello /> -->
+  <!-- <InputStatistics client:load /> -->
+  <!-- <Items client:load /> -->
+  <!-- <Hero /> -->
+  <!-- <div class="container mx-auto p-2">
+    <p>Hello!</p>
+  </div> -->
+  <!-- <Card /> -->
+  <!-- <CardCollection /> -->
+  <!-- <div class="container mx-auto flex flex-row">
+    <div class="bg-red-300 basis-1/6">left side</div>
+    <div class="bg-green-200 basis-4/6 pl-2">main</div>
+    <div class="bg-red-300 basis-1/6">right side</div>
+  </div> -->
+  <!-- <ServerSent client:load /> -->
+  <WebSocket client:load />
+</Layout>
