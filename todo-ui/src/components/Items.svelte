@@ -33,17 +33,17 @@
     };
 </script>
   
-<h1>Items</h1>
+<h1>Todos</h1>
 
 
 <input type="text" bind:value={item} />
-<button on:click={addItem}>Add item</button>
+<button on:click={addItem}>Add todo</button>
 
 {#await itemsPromise}
-<p>Loading items</p>
+<p>Loading todos</p>
 {:then items}
 {#if items.length == 0}
-    <p>No items available</p>
+    <p>No todos available</p>
 {:else}
     <ul>
     {#each items as item}

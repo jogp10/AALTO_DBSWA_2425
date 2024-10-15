@@ -1,15 +1,16 @@
 <script>
-    import Card from "./Card.svelte";
-  </script>
-  
+  import Card from "./Card.svelte";
+
+  export let items = [];
+
+  function handleMessage(event) {
+    messageFromChild = event.detail.value;
+    dispatch("delete", { value: messageFromChild });
+  }
+</script>
+
 <section class="grid grid-cols-4 gap-4">
-    <Card title="Card 1" />
-    <Card title="Card 2" />
-    <Card title="Card 3" />
-    <Card title="Card 4" />
-    <Card title="Card 5" />
-    <Card title="Card 6" />
-    <Card title="Card 7" />
-    <Card title="Card 8" />
+  {#each items as item}
+    <Card title={item.item} description={item.id} on:delete={handleMessage} />
+  {/each}
 </section>
-  
