@@ -1,8 +1,12 @@
 ---
 import Layout from "../layout/Layout.astro";
 import GradingButton from "../components/GradingButton.svelte";
+import Assignment from "../components/Assignment.svelte";
+import ProgressBar from "../components/ProgressBar.svelte";
 ---
 
 <Layout>
-  <GradingButton client:only={"svelte"} />
+  <h1>Welcome to the Programming UI</h1>
+  <ProgressBar client:load/>
+  <Assignment client:load />
 </Layout>

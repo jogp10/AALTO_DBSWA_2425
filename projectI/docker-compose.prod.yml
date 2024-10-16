@@ -15,14 +15,6 @@ services:
     ports:
       - 7800:7800
 
-  redis:
-    image: redis:latest
-    command: redis-server /usr/local/etc/redis/redis.conf
-    volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-    expose:
-      - 6379
-
   programming-api:
     build: programming-api
     image: programming-api
@@ -63,10 +55,6 @@ services:
     # deploy:
     #     replicas: 2
 
-  grader-image:
-    build: grader-image
-    image: grader-image
-
   database:
     container_name: database-server-dab-p1-0e13cd48-b2cf-4e4d-a707-db7d187e033e
     image: postgres:14.1
@@ -94,8 +82,8 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - database
-    # profiles:
-    #   - pgadmin
+    profiles:
+      - pgadmin
 
   e2e-playwright:
     entrypoint: "/bin/true"
