@@ -64,9 +64,6 @@ const handleRequest = async (request) => {
   try {
     const requestData = await request.json();
 
-    console.log("Request data:");
-    console.log(requestData);
-
     const code = requestData.code;
     const testCode = requestData.testCode;
 

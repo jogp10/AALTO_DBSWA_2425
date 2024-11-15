@@ -19,7 +19,7 @@ services:
     image: redis:latest
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis:/usr/local/etc/redis
     expose:
       - 6379
 
@@ -66,6 +66,16 @@ services:
   grader-image:
     build: grader-image
     image: grader-image
+
+  grader-queue:
+    build: grader-queue
+    image: grader-queue
+    restart: "no"
+    volumes:
+      - ./grader-queue/:/app
+      - ./app-cache/:/app-cache
+    depends_on:
+      - database
 
   database:
     container_name: database-server-dab-p1-0e13cd48-b2cf-4e4d-a707-db7d187e033e

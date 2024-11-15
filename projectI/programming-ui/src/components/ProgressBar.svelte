@@ -4,7 +4,7 @@
 
   const fetchUserProgress = async () => {
     const response = await fetch("/api/progress/" + $userUuid);
-    return (await response.json()).completed;
+    return (await response.json()).completed * 100;
   };
 
   const fetchTotalProgress = async () => {

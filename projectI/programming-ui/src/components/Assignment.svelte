@@ -18,38 +18,33 @@
     return await response.json();
   };
 
-  const fetchUserProgress = async () => {
-    const response = await fetch("/api/progress/" + $userUuid);
-    return await response.json();
-  };
+  async function submitCode(assignment_id) {
+    statusMessage = "Submitting your code...";
 
-  const fetchTotalProgress = async () => {
-    const response = await fetch("/api/assignment");
-    return await response.json().length;
-  };
+    const data = {
+      user_uuid: $userUuid,
+      code: userCode,
+      programming_assignment_id: assignment_id,
+    };
 
-  async function submitCode() {
-    statusMessage = "Submitting your code for grading...";
+    const response = await fetch("/api/assignment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-    // Simulating an async submission (like an API request)
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Simulate code grading
-    const isSuccessful = Math.random() > 0.5;
-    if (isSuccessful) {
-      statusMessage =
-        "Congratulations! You have successfully completed the assignment.";
-      isCompleted = true;
+    if (response.ok) {
+      statusMessage = "Code submitted successfully!";
     } else {
-      statusMessage = "There are issues with your code.";
-      feedback = "Error: Division by zero found on line 4.";
+      statusMessage = "Failed to submit code. Please try again.";
     }
   }
 
   let assignmentPromise = fetchAssignment();
 
-  onMount(() => {
-  });
+  onMount(() => {});
 </script>
 
 <article>
@@ -64,13 +59,19 @@
         placeholder="Write your Python code here..."
         rows="10"
       ></textarea>
-      <button on:click={submitCode}>Submit</button>
-      <GradingButton client:only={"svelte"} />
+      <button on:click={() => submitCode(assignment.id)}>Submit</button>
+      <GradingButton />
+      {#if statusMessage == "success"}
+        <button on:click={() => submitCode(assignment.id)}>Next Assignment</button>
+      {/if}
       {#if statusMessage}
         <p>{statusMessage}</p>
       {/if}
       {#if feedback}
-        <pre>{feedback}</pre>
+        <pre>{feedback.suggestions}</pre>
+        {#each feedback.errors as error}
+          <pre>{error}</pre>
+        {/each}
       {/if}
     {:else}
       <p>You have successfully completed this assignment!</p>
