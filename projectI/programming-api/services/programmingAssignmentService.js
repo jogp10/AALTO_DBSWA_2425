@@ -88,19 +88,6 @@ const submitAssignment = async (user_uuid, programming_assignment_id, code) => {
         `;
 };
 
-const updateSubmissionGrade = async (
-  assignment_id,
-  correct,
-  grader_feedback
-) => {
-  // Update the status of the submission
-  await sql`
-        UPDATE programming_assignment_submissions
-        SET status = "processed", grader_feedback = ${grader_feedback}, correct = ${correct}
-        WHERE id = ${assignment_id}
-        `;
-};
-
 const getUserProgress = async (user_uuid) => {
   // Count the number of completed assignments
   return await sql`
@@ -117,6 +104,5 @@ export {
   getSubmission,
   checkOngoingSubmission,
   submitAssignment,
-  updateSubmissionGrade,
   getUserProgress,
 };

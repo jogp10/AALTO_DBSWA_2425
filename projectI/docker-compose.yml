@@ -3,6 +3,7 @@ version: "3.4"
 volumes:
   astro_node_modules:
   pgadmin_data:
+  redis_data:
 
 services:
   nginx:
@@ -19,7 +20,8 @@ services:
     image: redis:latest
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
-      - ./redis:/usr/local/etc/redis
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_data:/data
     expose:
       - 6379
 
@@ -58,24 +60,16 @@ services:
       - ./grader-api/:/app
       - ./app-cache/:/app-cache
       - "/var/run/docker.sock:/var/run/docker.sock"
-    expose:
-      - 7000
-    # deploy:
-    #     replicas: 2
+    depends_on:
+      - database
+    env_file:
+      - project.env
+    deploy:
+        replicas: 2
 
   grader-image:
     build: grader-image
     image: grader-image
-
-  grader-queue:
-    build: grader-queue
-    image: grader-queue
-    restart: "no"
-    volumes:
-      - ./grader-queue/:/app
-      - ./app-cache/:/app-cache
-    depends_on:
-      - database
 
   database:
     container_name: database-server-dab-p1-0e13cd48-b2cf-4e4d-a707-db7d187e033e
@@ -104,8 +98,6 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - database
-    # profiles:
-    #   - pgadmin
 
   e2e-playwright:
     entrypoint: "/bin/true"

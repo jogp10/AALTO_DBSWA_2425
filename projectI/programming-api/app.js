@@ -1,13 +1,25 @@
 import * as programmingAssignmentService from "./services/programmingAssignmentService.js";
-import { serve } from "./deps.js";
+import { createClient, serve } from "./deps.js";
 import { cacheMethodCalls } from "./util/cacheUtil.js";
-import { createClient } from "./deps.js";
 
 const SERVER_ID = crypto.randomUUID();
 
+const client = createClient({
+  url: "redis://redis:6379",
+  pingInterval: 1000,
+});
+
+const pubsubClient = createClient({
+  url: "redis://redis:6379",
+  pingInterval: 1000,
+});
+
+await client.connect();
+await pubsubClient.connect();
+
 const cachedProgrammingService = cacheMethodCalls(
   programmingAssignmentService,
-  ["getNextAssignment"]
+  ["getNextAssignment", "submitAssignment"]
 );
 
 const handleGetGrade = async (request) => {
@@ -38,7 +50,6 @@ const handleGetGrade = async (request) => {
     let feedback = {};
 
     // Process grader result based on the first line of the response
-    console.log("hey" + graderResult);
     const firstLine = graderResult.split("\n")[0];
     if (firstLine === "." || firstLine === "..") {
       // Success case
@@ -94,9 +105,9 @@ const handleGetAssignment = async (request, urlPatternResult) => {
     const nextAssignment = await cachedProgrammingService.getNextAssignment(
       user_uuid
     );
-    
+
     if (nextAssignment.length === 0) {
-      return new Response("Completed all assignments", { status: 200 });
+      return Response.json({completed: "True" }, { status: 200 });
     }
 
     return Response.json(nextAssignment[0]);
@@ -111,13 +122,20 @@ const handleGetUserProgress = async (request, urlPatternResult) => {
     const progress = await cachedProgrammingService.getUserProgress(user_uuid);
     return Response.json(progress[0]);
   } catch (e) {
-    return new Response("Error while retrieving user progress", { status: 500 });
+    return new Response("Error while retrieving user progress", {
+      status: 500,
+    });
   }
 };
 
 const handlePostAssignment = async (request) => {
   try {
     const requestData = await request.json();
+    const result = {
+      message: "Assignment submitted for grading",
+      submissionId: -1,
+      graded: null,
+    }
 
     // Check if user has ongoing assignment (submission-status = 'pending')
     let submission = await cachedProgrammingService.checkOngoingSubmission(
@@ -125,7 +143,10 @@ const handlePostAssignment = async (request) => {
     );
 
     if (submission.length > 0) {
-      return new Response("You have an ongoing grading, wait for feedback", { status: 400 });
+      result.message = "You have an ongoing grading, wait for feedback";
+      return Response.json(result, {
+        status: 400,
+      });
     }
 
     // Check if user has already submitted the same code
@@ -136,7 +157,8 @@ const handlePostAssignment = async (request) => {
     );
 
     if (submission.length > 0) {
-      return new Response(submission[0], { status: 200 });
+      result.graded = submission[0];
+      return Response.json(result, { status: 200 });
     }
 
     // Submit the assignment
@@ -150,9 +172,11 @@ const handlePostAssignment = async (request) => {
     // Generate a unique ID for the submission, to UI subscribe to the channel
     const submissionId = crypto.randomUUID();
     requestData.submissionId = submissionId;
-    sendToGrade(requestData);
+    result.submissionId = submissionId;
+    await sendToGrade(requestData);
 
-    return new Response(submissionId, { status: 200 });
+    const response = Response.json(result, { status: 200 });
+    return response;
   } catch (e) {
     return new Response("Failed to submit assignment, " + e, { status: 500 });
   }
@@ -160,39 +184,60 @@ const handlePostAssignment = async (request) => {
 
 const sendToGrade = async (requestData) => {
   const programmingAssignment =
-      await cachedProgrammingService.getNextAssignmentTestCode(
-        requestData.user_uuid
-      );
+    await cachedProgrammingService.getNextAssignmentTestCode(
+      requestData.user_uuid
+    );
 
   const testCode = programmingAssignment[0]["test_code"];
   const data = {
     testCode: testCode,
     code: requestData.code,
-    metadata: requestData
+    metadata: requestData,
   };
 
-  const client = createClient({
-    url: "redis://redis:6379",
-    pingInterval: 1000,
+  // Add message to the Redis Stream
+  await client.xAdd("grading_queue", "*", {
+    message: JSON.stringify(data),
   });
- 
-  await client.connect();
+};
 
-  console.log("Connected to Redis and adding message to grading stream");
-  console.log(data); 
+const handleProgressUpdates = async (request, params) => {
+  const submissionId = params.pathname.groups.submissionId;
 
-  // Add message to the Redis Stream instead of publishing to a channel
-  await client.xAdd(
-    "grading_queue",  // Stream name
-    "*",              // Use "*" to auto-generate the message ID
-    {
-      message: JSON.stringify(data),
+  const body = new ReadableStream({
+    async start(controller) {
+      // Subscribe to the Redis feedback channel
+      const channel = "feedback-channel";
+      await pubsubClient.subscribe(channel, (message) => {
+        try { 
+          const feedback = JSON.parse(message);
+          if (feedback.submissionId === submissionId) {
+            console.log("Sending feedback to client", feedback);
+            const formattedMessage = `data: ${JSON.stringify(feedback)}\n\n`;
+            controller.enqueue(new TextEncoder().encode(formattedMessage));
+
+            // Optionally close the stream if only one update is needed
+            controller.close();
+          }
+        } catch (error) {
+          console.error("Error processing feedback message:", error);
+          controller.error(error);
+        }
+      });
+    }, 
+    cancel() {
+      pubsubClient.unsubscribe("feedback-channel");
     }
-  );
+  });
 
-  // Close the Redis connection
-  await client.disconnect();
-}
+  return new Response(body, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+};
 
 const urlMapping = [
   {
@@ -219,6 +264,11 @@ const urlMapping = [
     method: "GET",
     pattern: new URLPattern({ pathname: "/" }),
     fn: handleGetRoot,
+  },
+  {
+    method: "GET",
+    pattern: new URLPattern({ pathname: "/grading/:submissionId" }),
+    fn: handleProgressUpdates,
   },
 ];
 
