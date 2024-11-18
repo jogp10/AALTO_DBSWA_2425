@@ -7,7 +7,7 @@ This document outlines the steps to run the application in different environment
 ### Prerequisites
 
 - Ensure Docker and Docker Compose are installed on your system.
-- Verify necessary environment variables are set in `.env` or `project.env`.
+- Verify necessary environment variables are set in `project.env`.
 
 ## Running the Application
 
@@ -80,3 +80,15 @@ For development, use the default docker-compose.yml file, which may include addi
     ```
 
 - **Environment Variables:** Customize configurations by modifying the or project.env files according to your setup requirements.
+
+### Extras
+
+- **Grader API Replicas:** To scale the Grader API service, change the number of replicas in the docker-compose file:
+
+    ```bash
+    services:
+      grader-api:
+        ...
+        deploy:
+          replicas: <NUMBER_OF_REPLICAS>
+    ```
