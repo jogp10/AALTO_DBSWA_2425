@@ -17,6 +17,7 @@ const cacheMethodCalls = (object, methodsToFlushCacheWith = []) => {
 
         const cacheKey = `${methodName}-${JSON.stringify(methodArgs)}`;
         const cacheResult = await redis.get(cacheKey);
+
         if (!cacheResult) {
           const result = await method.apply(this, methodArgs);
           await redis.set(cacheKey, JSON.stringify(result));

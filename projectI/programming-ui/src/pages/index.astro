@@ -5,8 +5,22 @@ import Assignment from "../components/Assignment.svelte";
 import ProgressBar from "../components/ProgressBar.svelte";
 ---
 
-<Layout>
-  <h1>Welcome to the Programming UI</h1>
-  <ProgressBar client:load/>
-  <Assignment client:load />
+<Layout class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <h1 class="text-3xl font-bold mb-6 text-blue-700">Welcome to the Programming UI</h1>
+    
+    <!-- Progress Bar Component -->
+    <section class="mb-8">
+      <ProgressBar client:load />
+    </section>
+
+    <!-- Assignment Component -->
+    <section>
+      <Assignment client:load />
+    </section>
+  </div>
 </Layout>
+
+<style>
+  /* Additional styles for layout if needed */
+</style>

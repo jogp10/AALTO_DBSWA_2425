@@ -4,7 +4,7 @@
 
   const fetchUserProgress = async () => {
     const response = await fetch("/api/progress/" + $userUuid);
-    return (await response.json()).completed;
+    return (await response.json()).completed * 100;
   };
 
   const fetchTotalProgress = async () => {
@@ -17,13 +17,16 @@
   onMount(() => {});
 </script>
 
-<article>
-  <h2>
+<article class="p-6">
+  <h2 class="text-xl font-semibold mb-4">
     Progress
     {#await progressPromise}
-      <p>Loading progress...</p>
+      <p class="text-gray-600">Loading progress...</p>
     {:then [userProgress, totalProgress]}
-      {userProgress}/{totalProgress}
+      <span class="text-blue-500">{userProgress}/{totalProgress}</span>
+    {:catch error}
+      <p class="text-red-500">Error loading progress: {error.message}</p>
     {/await}
   </h2>
 </article>
+
