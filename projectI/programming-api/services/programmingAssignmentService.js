@@ -51,16 +51,10 @@ LIMIT 1;
     `;
 };
 
-const getNextAssignmentTestCode = async (user_uuid) => {
-  // Find the next incomplete assignment
+const getNextAssignmentTestCode = async (programming_assignment_id) => {
   return await sql`
       SELECT pa.id, pa.test_code
-      FROM programming_assignments pa
-      LEFT JOIN programming_assignment_submissions pas
-      ON pa.id = pas.programming_assignment_id AND pas.user_uuid = ${user_uuid}
-      WHERE pas.status = 'pending' OR pas.id IS NULL
-      ORDER BY pa.assignment_order
-      LIMIT 1
+      FROM programming_assignments pa WHERE pa.id = ${programming_assignment_id}
     `;
 };
 

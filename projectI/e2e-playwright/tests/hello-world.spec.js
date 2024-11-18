@@ -12,127 +12,117 @@ test.describe("End-to-End Tests for Assignment Submissions", () => {
   test("Should create a failed submission and check feedback", async ({
     page,
   }) => {
-    await page.goto("/assignments");
+    await page.goto("/");
 
     // Select the assignment and submit incorrect code
-    await page.click("text=Start Assignment");
-    await page.fill("#codeEditor", "incorrect code"); // replace with specific failing code
+    await page.fill("#codeEditor", "def hello(): return -1");
     await page.click("#submitButton");
 
     // Wait for the processing to complete and check feedback
-    await page.waitForSelector("#feedback", { state: "visible" });
-    const feedback = await page.locator("#feedback").textContent();
-    expect(feedback).toContain("Incorrect submission");
+    await page.waitForSelector("#submission_feedback", { state: "visible" });
+    const submissionFeedback = await page.locator("#submission_feedback").textContent();
+    expect(submissionFeedback).toContain("FAIL");
   });
 
   // Test 2: Creating a submission that passes and checking success notification
   test("Should create a successful submission and check success notification", async ({
     page,
   }) => {
-    await page.goto("/assignments");
+    await page.goto("/");
 
     // Select the assignment and submit correct code
-    await page.click("text=Start Assignment");
-    await page.fill("#codeEditor", "correct code"); // replace with specific correct code
+    await page.fill("#codeEditor", "def hello(): return \"Hello\"");
     await page.click("#submitButton");
 
-    // Wait for the processing to complete and check success notification
-    await page.waitForSelector("#successNotification", { state: "visible" });
-    const successNotification = await page
-      .locator("#successNotification")
-      .textContent();
-    expect(successNotification).toContain("Correct submission");
+    // Wait for the success message and check success notification
+    await page.waitForSelector("#successMessage", { state: "visible" });
+    const successMessage = await page.locator("#successMessage").textContent();
+    expect(successMessage).toContain(
+      "You have successfully completed this assignment"
+    );
   });
 
   // Test 3: Create a successful submission, verify, and move to the next assignment
   test("Should submit a correct submission, verify it, and proceed to next assignment", async ({
     page,
   }) => {
-    await page.goto("/assignments");
+    await page.goto("/");
+
+    const oldTitle = await page.locator("#assignmentTitle").textContent();
 
     // Submit correct code for the current assignment
-    await page.click("text=Start Assignment");
-    await page.fill("#codeEditor", "correct code"); // replace with specific correct code
+    await page.fill("#codeEditor", "def hello(): return \"Hello\"");
     await page.click("#submitButton");
 
-    // Check the success notification
-    await page.waitForSelector("#successNotification", { state: "visible" });
-    const successNotification = await page
-      .locator("#successNotification")
-      .textContent();
-    expect(successNotification).toContain("Correct submission");
+    // Check the success message
+    await page.waitForSelector("#successMessage", { state: "visible" });
+    const successMessage = await page.locator("#successMessage").textContent();
+    expect(successMessage).toContain(
+      "You have successfully completed this assignment"
+    );
 
-    // Move to the next assignment
     await page.click("#nextAssignmentButton");
 
-    // Verify that the new assignment loaded is different
-    const assignmentId = await page.locator("#assignmentId").textContent();
-    expect(assignmentId).not.toBe("previous assignment id"); // Replace with previous assignment id logic if applicable
+    // Verify that a new assignment loaded
+    const newAssignmentTitle = await page
+      .locator("#assignmentTitle")
+      .textContent();
+    expect(newAssignmentTitle).not.toBe(null);
+    
+    expect(newAssignmentTitle).not.toBe(oldTitle);
   });
 });
 
+
 test.describe("Points Update Tests on Assignment Completion", () => {
+  
   // Test: Check points increase after solving an assignment correctly
   test("Should update points after solving an assignment", async ({ page }) => {
-    await page.goto("/assignments");
+    await page.goto("/");
 
     // Capture the initial points shown to the user
-    const initialPointsText = await page
-      .locator("#pointsDisplay")
-      .textContent();
-    const initialPoints = parseInt(initialPointsText, 10);
+    const initialPointsText = await page.locator("#pointsDisplay").textContent();
+    const initialPoints = parseInt(initialPointsText);
 
-    // Start the assignment and submit correct code
-    await page.click("text=Start Assignment");
-    await page.fill("#codeEditor", "correct code"); // replace with the code that passes the test
+    // Start the assignment, submit correct code
+    await page.fill("#codeEditor", 'def hello(): return "Hello"');
     await page.click("#submitButton");
 
     // Wait for success notification
-    await page.waitForSelector("#successNotification", { state: "visible" });
-    const successNotification = await page
-      .locator("#successNotification")
-      .textContent();
-    expect(successNotification).toContain("Correct submission");
+    await page.waitForSelector("#successMessage", { state: "visible" });
+    const successMessage = await page.locator("#successMessage").textContent();
+    expect(successMessage).toContain("You have successfully completed this assignment");
 
-    // Capture the points after successful submission
-    const updatedPointsText = await page
-      .locator("#pointsDisplay")
-      .textContent();
-    const updatedPoints = parseInt(updatedPointsText, 10);
+    await page.click("#nextAssignmentButton");
+
+    await page.waitForSelector("#codeEditor", { state: "visible" });
+
+    const updatedPointsText = await page.locator("#pointsDisplay").textContent();
+    const updatedPoints = parseInt(updatedPointsText);
 
     // Check that points have increased
     expect(updatedPoints).toBeGreaterThan(initialPoints);
   });
 
   // Test: Points should not change after a failed submission
-  test("Should not update points after a failed submission", async ({
-    page,
-  }) => {
-    await page.goto("/assignments");
+  test("Should not update points after a failed submission", async ({ page }) => {
+    await page.goto("/");
 
     // Capture the initial points shown to the user
-    const initialPointsText = await page
-      .locator("#pointsDisplay")
-      .textContent();
-    const initialPoints = parseInt(initialPointsText, 10);
+    const initialPointsText = await page.locator("#pointsDisplay").textContent();
+    const initialPoints = parseInt(initialPointsText);
 
     // Start the assignment and submit incorrect code
-    await page.click("text=Start Assignment");
-    await page.fill("#codeEditor", "incorrect code"); // replace with code that fails the test
+    await page.fill("#codeEditor", "def hello(): return -1");
     await page.click("#submitButton");
 
-    // Wait for feedback indicating failure
-    await page.waitForSelector("#feedback", { state: "visible" });
-    const feedback = await page.locator("#feedback").textContent();
-    expect(feedback).toContain("Incorrect submission");
+    await page.waitForSelector("#submission_feedback", { state: "visible" });
+    const submissionFeedback = await page.locator("#submission_feedback").textContent();
+    expect(submissionFeedback).toContain("FAIL");
 
-    // Capture points after the failed submission
-    const pointsAfterFailureText = await page
-      .locator("#pointsDisplay")
-      .textContent();
-    const pointsAfterFailure = parseInt(pointsAfterFailureText, 10);
+    const pointsAfterFailureText = await page.locator("#pointsDisplay").textContent();
+    const pointsAfterFailure = parseInt(pointsAfterFailureText);
 
-    // Ensure points have not increased after failure
     expect(pointsAfterFailure).toBe(initialPoints);
   });
 });

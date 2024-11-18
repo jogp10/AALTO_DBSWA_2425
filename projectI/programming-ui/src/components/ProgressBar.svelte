@@ -17,16 +17,15 @@
   onMount(() => {});
 </script>
 
-<article class="p-6">
-  <h2 class="text-xl font-semibold mb-4">
+<article class="p-6" id="progressContainer">
+  <h2 class="text-xl font-semibold" id="progressTitle">
     Progress
     {#await progressPromise}
-      <p class="text-gray-600">Loading progress...</p>
+      <p class="text-gray-600" id="loadingProgressMessage">Loading progress...</p>
     {:then [userProgress, totalProgress]}
-      <span class="text-blue-500">{userProgress}/{totalProgress}</span>
+      <span id="progressBar" class="text-blue-500"><span id="pointsDisplay">{userProgress}</span>/<span id="totalPoints">{totalProgress}</span></span>
     {:catch error}
-      <p class="text-red-500">Error loading progress: {error.message}</p>
+      <p id="progressErrorMessage" class="text-red-500">Error loading progress: {error.message}</p>
     {/await}
   </h2>
 </article>
-

@@ -4,6 +4,7 @@
   let userCode = "";
   let statusMessage = "";
   let feedback = "";
+  let submissionFeedback = "";
   let isCompleted = false;
 
   // This function could simulate fetching data from an API
@@ -20,6 +21,7 @@
   async function submitCode(assignment_id) {
     statusMessage = "Submitting your code...";
     feedback = "";
+    submissionFeedback = "";
 
     const data = {
       user_uuid: $userUuid,
@@ -58,7 +60,7 @@
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        feedback = data.feedback;  // Update feedback with the received data
+        submissionFeedback = data.feedback;  // Update feedback with the received data
         isCompleted = data.correct;
         console.log("Feedback received:", data);
         eventSource.close();
@@ -78,49 +80,62 @@
   onMount(() => {});
 </script>
 
-<article class="p-6">
-  <!-- Status Message Display -->
-  {#if statusMessage}
-    <p class="mb-4 text-blue-600 font-medium">{statusMessage}</p>
-  {/if}
-
+<article class="p-6" id="assignmentContainer">
   {#await assignmentPromise}
-    <p class="text-gray-600">Loading assignment...</p>
+    <p class="text-gray-600" id="loadingMessage">Loading assignment...</p>
   {:then assignment}
-    
+
     <!-- All assignments completed message -->
     {#if assignment.completed}
-      <h2 class="text-xl font-semibold mb-4">Congratulations!</h2>
-      <p class="text-green-600 font-medium">You have successfully completed all assignments. Great job!</p>
-    
+      <h2 class="text-xl font-semibold mb-4" id="completionTitle">Congratulations!</h2>
+      <p class="text-green-600 font-medium" id="completionMessage">
+        You have successfully completed all assignments. Great job!
+      </p>
+
     <!-- Assignment details and submission box -->
     {:else}
-      <h2 class="text-xl font-semibold mb-4">{assignment.title}</h2>
-      <p class="mb-6">{assignment.handout}</p>
+      <h2 class="text-xl font-semibold mb-4" id="assignmentTitle">{assignment.title}</h2>
+      <p class="mb-6" id="assignmentHandout">{assignment.handout}</p>
 
       {#if !isCompleted}
         <textarea
+          id="codeEditor"
           bind:value={userCode}
           placeholder="Write your Python code here..."
           rows="10"
           class="w-full p-3 border border-gray-300 rounded-md font-mono"
         ></textarea>
 
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
-          on:click={() => submitCode(assignment.id)}
-          aria-label="Submit Code"
-        >
-          Submit
-        </button>
+        <div class="flex items-center">
+          <button
+            id="submitButton"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
+            on:click={() => submitCode(assignment.id)}
+            aria-label="Submit Code"
+          >
+            Submit
+          </button>
 
-        {#if feedback}
-          <pre class="mt-4 p-4 bg-gray-100 border border-gray-300 rounded">{feedback}</pre>
+          <!-- Status Message Display -->
+          {#if statusMessage}
+            <p id="statusMessage" class="text-blue-600 font-medium self-auto">{statusMessage}</p>
+          {/if}
+        </div>
+
+        {#if feedback && !submissionFeedback}
+          <pre id="feedback" class="mt-4 p-4 bg-gray-100 border border-gray-300 rounded">{feedback}</pre>
+        {/if}
+
+        {#if submissionFeedback}
+          <pre id="submission_feedback" class="mt-4 p-4 bg-gray-100 border border-gray-300 rounded">{submissionFeedback}</pre>
         {/if}
 
       {:else}
-        <p class="text-green-600 font-semibold mt-4">You have successfully completed this assignment!</p>
+        <p id="successMessage" class="text-green-600 font-semibold mt-4">
+          You have successfully completed this assignment!
+        </p>
         <button
+          id="nextAssignmentButton"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 rounded m-4"
           on:click={() => location.reload()}
           aria-label="Start Next Assignment"
@@ -131,7 +146,7 @@
     {/if}
 
   {:catch error}
-    <p class="text-red-500">Error loading assignment: {error.message}</p>
+    <p id="errorMessage" class="text-red-500">Error loading assignment: {error.message}</p>
   {/await}
 </article>
 

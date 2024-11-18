@@ -19,73 +19,8 @@ await pubsubClient.connect();
 
 const cachedProgrammingService = cacheMethodCalls(
   programmingAssignmentService,
-  ["getNextAssignment", "submitAssignment"]
+  ["submitAssignment"]
 );
-
-const handleGetGrade = async (request) => {
-  try {
-    const requestData = await request.json();
-
-    const programmingAssignment =
-      await cachedProgrammingService.getNextAssignmentTestCode(
-        requestData.user
-      );
-    const testCode = programmingAssignment[0]["test_code"];
-    const data = {
-      testCode: testCode,
-      code: requestData.code,
-    };
-
-    const graderResponse = await fetch("http://grader-api:7000/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    // Parse the grader's response
-    const graderResult = (await graderResponse.json()).result; // Assuming it returns text with first-line indicators
-
-    let feedback = {};
-
-    // Process grader result based on the first line of the response
-    const firstLine = graderResult.split("\n")[0];
-    if (firstLine === "." || firstLine === "..") {
-      // Success case
-      feedback = {
-        status: "success",
-        message: "You have successfully completed the assignment!",
-      };
-    } else if (firstLine == "F") {
-      // Test failure case
-      feedback = {
-        status: "fail",
-        feedback: {
-          errors: graderResult.split("\n").slice(1), // The rest of the lines are feedback
-          suggestions: "Review test case failures and adjust your code.",
-        },
-      };
-    } else {
-      // Error case (likely a syntax or runtime error)
-      feedback = {
-        status: "error",
-        feedback: {
-          errors: graderResult.split("\n"), // The lines are error details
-          suggestions: "Fix the syntax or runtime errors in your code.",
-        },
-      };
-    }
-
-    // Return the processed feedback as a response
-    return new Response(JSON.stringify(feedback), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (e) {
-    return new Response("Failed to grade assignment", { status: 500 });
-  }
-};
 
 const handleGetRoot = async (request) => {
   return new Response(`Hello from ${SERVER_ID}`);
@@ -107,7 +42,7 @@ const handleGetAssignment = async (request, urlPatternResult) => {
     );
 
     if (nextAssignment.length === 0) {
-      return Response.json({completed: "True" }, { status: 200 });
+      return Response.json({ completed: "True" }, { status: 200 });
     }
 
     return Response.json(nextAssignment[0]);
@@ -135,7 +70,7 @@ const handlePostAssignment = async (request) => {
       message: "Assignment submitted for grading",
       submissionId: -1,
       graded: null,
-    }
+    };
 
     // Check if user has ongoing assignment (submission-status = 'pending')
     let submission = await cachedProgrammingService.checkOngoingSubmission(
@@ -185,7 +120,7 @@ const handlePostAssignment = async (request) => {
 const sendToGrade = async (requestData) => {
   const programmingAssignment =
     await cachedProgrammingService.getNextAssignmentTestCode(
-      requestData.user_uuid
+      requestData.programming_assignment_id
     );
 
   const testCode = programmingAssignment[0]["test_code"];
@@ -209,7 +144,7 @@ const handleProgressUpdates = async (request, params) => {
       // Subscribe to the Redis feedback channel
       const channel = "feedback-channel";
       await pubsubClient.subscribe(channel, (message) => {
-        try { 
+        try {
           const feedback = JSON.parse(message);
           if (feedback.submissionId === submissionId) {
             console.log("Sending feedback to client", feedback);
@@ -224,10 +159,10 @@ const handleProgressUpdates = async (request, params) => {
           controller.error(error);
         }
       });
-    }, 
+    },
     cancel() {
       pubsubClient.unsubscribe("feedback-channel");
-    }
+    },
   });
 
   return new Response(body, {
