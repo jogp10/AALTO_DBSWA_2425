@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-app-database-migration-job
+spec:
+  template:
+    metadata:
+      name: my-app-database-migration-job
+    spec:
+      containers:
+        - name: my-app-database-migrations
+          image: my-app-database-migrations:latest
+          imagePullPolicy: Never
+          env:
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: my-app-database-cluster-app
+                  key: username
+                  optional: false
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-app-database-cluster-app
+                  key: password
+                  optional: false
+      restartPolicy: Never
+  backoffLimit: 2

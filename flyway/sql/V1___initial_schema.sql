@@ -7,3 +7,8 @@ CREATE TABLE todos (
   id SERIAL PRIMARY KEY,
   item TEXT NOT NULL
 );
+
+CREATE TABLE visit_log (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP
+);
