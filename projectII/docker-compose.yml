@@ -13,7 +13,6 @@ services:
     depends_on:
       - qa-api
       - qa-ui
-      - llm-api
     ports:
       - 7800:7800
 
