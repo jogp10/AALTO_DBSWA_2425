@@ -2,6 +2,8 @@ version: "3.4"
 
 volumes:
   astro_node_modules:
+  pgadmin_data:
+  redis_data:
 
 services:
   nginx:
@@ -11,8 +13,18 @@ services:
     depends_on:
       - qa-api
       - qa-ui
+      - llm-api
     ports:
       - 7800:7800
+
+  redis:
+    image: redis:latest
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis_data:/data
+    expose:
+      - 6379
 
   qa-api:
     build: qa-api
@@ -64,6 +76,17 @@ services:
     command: -connectRetries=60 -baselineOnMigrate=true migrate
     env_file:
       - project.env
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - project.env
+    ports:
+      - "8888:80"
+    depends_on:
+      - database
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
   e2e-playwright:
     entrypoint: "/bin/true"

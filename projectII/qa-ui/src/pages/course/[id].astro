@@ -1,0 +1,15 @@
+---
+import Layout from "../../layout/Layout.astro";
+import QuestionList from "../../components/QuestionList.svelte";
+import QuestionForm from "../../components/QuestionForm.svelte";
+import CoursePresentation from "../../components/CoursePresentation.svelte";
+
+const courseId = Astro.params.id;
+---
+
+<Layout>
+  <CoursePresentation client:load courseId={courseId} />
+  <h1>Course Questions</h1>
+  <QuestionForm client:load courseId={courseId} />
+  <QuestionList client:load courseId={courseId}/>
+</Layout>

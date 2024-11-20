@@ -1,8 +1,11 @@
 ---
 import Layout from "../layout/Layout.astro";
 import TestButton from "../components/TestButton.svelte";
+import CourseList from "../components/CourseList.svelte";
 ---
 
 <Layout>
+  <h1>Courses</h1>
   <TestButton client:only={"svelte"} />
+  <CourseList client:load />
 </Layout>
