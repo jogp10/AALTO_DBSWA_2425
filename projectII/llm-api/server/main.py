@@ -10,4 +10,5 @@ async def main():
 @app.post("/")
 async def ask_question(request: Request):
     data = await request.json()
+    print(data["question"])
     return generator(data["question"])

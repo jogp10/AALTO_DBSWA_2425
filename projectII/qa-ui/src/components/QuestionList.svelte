@@ -9,9 +9,10 @@
   let questions = [];
   let newQuestions = [];
 
+  let ws;
 
   const fetchQuestions = async () => {
-    const questions = await fetch(`/api/courses/${courseId}/questions?page=${page}`);
+    const questions = await fetch(`/api/courses/${courseId}/questions?page=${page}&user_uuid=${$userUuid}`);
     newQuestions = await questions.json();
   };
 
@@ -24,11 +25,35 @@
       },
       body: JSON.stringify({ user_uuid: $userUuid, type: 'question', id: questionId }),
     });
+
+    window.location.reload();
+  };
+
+  const subscribeToUpdates = async () => {
+    const host = window.location.hostname;
+    ws = new WebSocket("/api/subscribe_updates");
+
+    ws.onmessage = (event) => {
+      console.log("message");
+      console.log(event.data);
+      const parsedData = JSON.parse(event.data);
+      console.log(parsedData.course_id == courseId);
+      if (parsedData.course_id == courseId) {
+        questions = [parsedData, ...questions];
+      }
+    };
   };
 
   onMount(()=> {
 		fetchQuestions();
-	})
+    subscribeToUpdates();
+
+    return () => {
+      if (ws.readyState === 1) {
+        ws.close();
+      }
+    };
+	})  
 
   $: questions = [
 		...questions,
@@ -58,17 +83,28 @@
   }
 </style>
 
-<ul>
+<ul class="space-y-4 my-1">
   {#each questions as question}
-    <li>
-      <a href={`/question/${question.id}`}>{question.title}</a>
-      <p>Votes: {question.votes}</p>
-      <button on:click={() => handleUpvote(question.id)}>Upvote</button>
-      <p>By {question.user_uuid} at {question.created_at}</p>
-    </li>
+  <li class="p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100">
+    <a href={`/question/${question.id}`} class="text-blue-500 hover:underline">{question.title}</a>
+    <p class="text-sm text-gray-700">{question.content}</p>
+    <p class="text-sm text-gray-500">Votes: {question.votes}</p>
+    <button 
+      on:click={() => handleUpvote(question.id)} 
+      class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      {#if question.upvoted}
+        Downvote
+      {:else}
+        Upvote
+      {/if}
+    </button>
+  </li>
   {/each}
   <InfiniteScroll
   hasMore={newQuestions.length}
   threshold={100}
-  on:loadMore={() => {page++; fetchQuestions()}} />
+  on:loadMore={() => {page++; fetchQuestions()}}
+  class="mt-4"
+  />
 </ul>

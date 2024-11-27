@@ -19,9 +19,10 @@ const handleRequest = async (request) => {
   return new Response(body, {
     headers: {
       "Content-Type": "text/event-stream",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      Connection: "keep-alive",
     },
   });
 };
-
-serve(handleRequest, { port: 7777 });
+ 
+serve(handleRequest, { port: 1111 });

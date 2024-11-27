@@ -1,11 +1,13 @@
 ---
+export const prerender = true;
+
 import Layout from "../layout/Layout.astro";
-import TestButton from "../components/TestButton.svelte";
 import CourseList from "../components/CourseList.svelte";
 ---
 
 <Layout>
-  <h1>Courses</h1>
-  <TestButton client:only={"svelte"} />
-  <CourseList client:load />
+  <div class="container mx-auto p-4 space-y-8">
+    <h1 class="text-3xl font-bold">Courses</h1>
+    <CourseList client:load />
+  </div>
 </Layout>

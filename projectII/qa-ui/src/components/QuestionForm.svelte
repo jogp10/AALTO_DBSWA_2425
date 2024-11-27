@@ -19,8 +19,24 @@
   }
 </script>
 
-<form on:submit|preventDefault={() => handleQuestionSubmit({ title, content })}>
-  <input type="text" bind:value={title} placeholder="Question title" required />
-  <textarea bind:value={content} placeholder="Question details" required></textarea>
-  <button type="submit">Post Question</button>
+<form on:submit|preventDefault={() => handleQuestionSubmit({ title, content })} class="space-y-4">
+  <input 
+    type="text" 
+    bind:value={title} 
+    placeholder="Question title" 
+    required 
+    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+  <textarea 
+    bind:value={content} 
+    placeholder="Question details" 
+    required 
+    class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  ></textarea>
+  <button 
+    type="submit" 
+    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  >
+    Post Question
+  </button>
 </form>

@@ -25,6 +25,12 @@ const getQuestions = async (courseId, page = 1) => {
     return result;
 };
 
+const getVotesByUser = async (user_uuid) => {
+    const query = sql`SELECT * FROM votes WHERE user_uuid = ${user_uuid}`;
+    const result = await query;
+    return result;
+}
+
 const getQuestion = async (questionId) => {
     const query = sql`SELECT * FROM questions WHERE id = ${questionId}`;
     const result = await query;
@@ -161,6 +167,7 @@ export {
     getCourses,
     getCourse,
     getQuestions,
+    getVotesByUser,
     getQuestion,
     getAnswers,
     addQuestion,

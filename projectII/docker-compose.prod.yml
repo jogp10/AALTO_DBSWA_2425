@@ -72,7 +72,7 @@ services:
     build:
       context: llm-api
       dockerfile: Dockerfile.prod
-    image: llm-api-prod
+    image: llm-api
     restart: "on-failure"
     expose:
       - 7000

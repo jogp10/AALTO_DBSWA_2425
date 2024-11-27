@@ -1,8 +1,8 @@
-FROM node:lts-alpine3.17 as build
+FROM node:lts-alpine3.17 AS build
 
 WORKDIR /app
 
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 
 COPY *.json ./
 
@@ -12,12 +12,29 @@ COPY . .
 
 RUN astro build
 
-FROM nginx:latest as server
+# Production Stage for Node.js
+FROM node:lts-alpine3.17 AS app
+
+WORKDIR /app
+
+# Copy necessary files from the build stage
+COPY *.json ./
+COPY --from=build /app/dist /app/dist
+
+# Install production dependencies only
+RUN npm install --production
 
 EXPOSE 3000
 
-RUN sed -i "s/80/3000/g" /etc/nginx/conf.d/default.conf
+# Start the Astro Node.js server
+CMD ["node", "dist/server/entry.mjs"]
 
-COPY --from=build /app/dist /usr/share/nginx/html
+# FROM nginx:latest AS server
 
-CMD ["nginx", "-g", "daemon off;"]
+# EXPOSE 3000
+
+# RUN sed -i "s/80/3000/g" /etc/nginx/conf.d/default.conf
+
+# COPY --from=app /app/dist /usr/share/nginx/html
+
+# CMD ["nginx", "-g", "daemon off;"]

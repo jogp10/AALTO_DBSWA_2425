@@ -7,8 +7,27 @@ import QuestionPresentation from "../../components/QuestionPresentation.svelte";
 const questionId = Astro.params.id;
 ---
 
+<style>
+  .flex-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .flex-item {
+    flex: 1;
+  }
+</style>
+
 <Layout>
-  <QuestionPresentation client:load questionId={questionId} />
-  <AnswerForm client:load questionId={questionId}/>
-  <AnswerList client:load questionId={questionId}/>
+  <div class="mx-auto p-4 space-y-8 flex-container">
+    <QuestionPresentation client:load questionId={questionId} />
+    
+    <div class="space-y-4">
+      <h1 class="text-3xl font-bold">Answers</h1>
+      <AnswerForm client:load questionId={questionId} />
+      <div class="flex-item">
+        <AnswerList client:load questionId={questionId} />
+      </div>
+    </div>
+  </div>
 </Layout>

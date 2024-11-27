@@ -39,9 +39,14 @@ CREATE TABLE votes (
 
 -- Add indexes for optimized queries
 CREATE INDEX idx_questions_course_id ON questions(course_id);
-CREATE INDEX idx_questions_created_at ON questions(created_at DESC);
+CREATE INDEX idx_questions_updated_at ON questions(updated_at DESC);
+CREATE INDEX idx_questions_user_uuid ON questions(user_uuid);
 CREATE INDEX idx_answers_question_id ON answers(question_id);
-CREATE INDEX idx_answers_created_at ON answers(created_at DESC);
+CREATE INDEX idx_answers_updated_at ON answers(updated_at DESC);
+CREATE INDEX idx_answers_user_uuid ON answers(user_uuid);
+CREATE INDEX idx_votes_user_uuid ON votes(user_uuid);
+CREATE INDEX idx_votes_question_id ON votes(question_id);
+CREATE INDEX idx_votes_answer_id ON votes(answer_id);
 
 
 -- Trigger to update the votes in answers and questions
