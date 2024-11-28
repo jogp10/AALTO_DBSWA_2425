@@ -1,5 +1,6 @@
 import * as databaseService from "./qaService.js";
 import { connect } from "../deps.js";
+import { sockets } from "../app.js";
 
 const redis = await connect({ hostname: "redis", port: 6379 });
 
@@ -41,7 +42,7 @@ const processQueue = async () => {
                 answer = answer.replaceAll('\n', '');
             }
 
-          console.log(`Generated answer ${i}:`, answer);
+          console.log(`Generated answer ${i}:`, answer, `\nOriginal answer:`, text[0].generated_text);
           console.log(text);
           generatedAnswers.push(answer);
         }
@@ -53,10 +54,22 @@ const processQueue = async () => {
         );
 
         // Here you can add the logic to store the answers in your database.
-        await databaseService.saveGeneratedAnswers({
+        const answers = await databaseService.saveGeneratedAnswers({
             questionId,
             generatedAnswers,
           });
+
+        sockets.forEach((socket) => {
+          try {
+            answers.forEach((answer) => {
+              socket.send(JSON.stringify(answer[0]));
+              console.log('Sending answer to socket:', answer[0]);
+            });
+          } catch (e) {
+            console.error("Failed to send generated answers to socket:", e);
+            sockets.delete(socket);
+          }
+        });
       } catch (error) {
         console.error(
           `Failed to process job for questionId ${questionId}:`,

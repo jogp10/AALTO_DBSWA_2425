@@ -57,7 +57,8 @@ const addQuestion = async (courseId, data) => {
 }
 
 const getLastQuestion = async (data) => {
-    const query = sql`SELECT * FROM questions WHERE user_uuid = ${data.user_uuid} ORDER BY created_at DESC LIMIT 1`;
+    // Get if user has posted a question in the last minute
+    const query = sql`SELECT * FROM questions WHERE user_uuid = ${data.user_uuid} AND created_at > NOW() - INTERVAL '1 minute' ORDER BY created_at DESC LIMIT 1`;
     const result = await query;
     return result[0];
 }
@@ -69,7 +70,7 @@ const checkAnswer = async (data) => {
 }
 
 const getLastAnswer = async (data) => {
-    const query = sql`SELECT * FROM answers WHERE user_uuid = ${data.user_uuid} ORDER BY created_at DESC LIMIT 1`;
+    const query = sql`SELECT * FROM answers WHERE user_uuid = ${data.user_uuid} AND created_at > NOW() - INTERVAL '1 minute' ORDER BY created_at DESC LIMIT 1`;
     const result = await query;
     return result[0];
 }
@@ -158,9 +159,7 @@ const saveGeneratedAnswers = async (data) => {
         `;
     });
 
-    await Promise.all(queries);
-
-    return data.generatedAnswers;
+    return await Promise.all(queries);
 }
 
 export {

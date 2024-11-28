@@ -10,7 +10,7 @@ let sockets = new Set();
 
 const qaService = cacheMethodCalls(
   apiService,
-  ["upVote", "addQuestion", "addAnswer", "deleteVote", "saveGeneratedAnswers", "checkVote"],
+  ["upVote", "addQuestion", "addAnswer", "deleteVote", "saveGeneratedAnswers", "checkVote", "getLastAnswer", "getLastQuestion"],
 );
 
 const handleGetRoot = async (request) => {
@@ -300,3 +300,5 @@ const handleRequest = async (request) => {
 
 const portConfig = { port: 7777, hostname: "0.0.0.0" };
 serve(handleRequest, portConfig);
+
+export { sockets }
