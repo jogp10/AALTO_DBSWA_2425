@@ -42,16 +42,8 @@ const processQueue = async () => {
                 answer = answer.replaceAll('\n', '');
             }
 
-          console.log(`Generated answer ${i}:`, answer, `\nOriginal answer:`, text[0].generated_text);
-          console.log(text);
           generatedAnswers.push(answer);
         }
-
-        // Simulate storing generated answers in the database
-        console.log(
-          `Storing answers for questionId ${questionId}:`,
-          generatedAnswers
-        );
 
         // Here you can add the logic to store the answers in your database.
         const answers = await databaseService.saveGeneratedAnswers({
@@ -63,7 +55,6 @@ const processQueue = async () => {
           try {
             answers.forEach((answer) => {
               socket.send(JSON.stringify(answer[0]));
-              console.log('Sending answer to socket:', answer[0]);
             });
           } catch (e) {
             console.error("Failed to send generated answers to socket:", e);

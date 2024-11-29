@@ -10,7 +10,7 @@ let sockets = new Set();
 
 const qaService = cacheMethodCalls(
   apiService,
-  ["upVote", "addQuestion", "addAnswer", "deleteVote", "saveGeneratedAnswers", "checkVote", "getLastAnswer", "getLastQuestion"],
+  ["addQuestion", "addAnswer", "deleteVote", "upVote", "saveGeneratedAnswers", "getLastAnswer", "getLastQuestion"],
 );
 
 const handleGetRoot = async (request) => {
@@ -111,6 +111,8 @@ const handlePostQuestion = async (request, params) => {
 
   // Check if user has posted in last minute
   const lastQuestion = await qaService.getLastQuestion(data);
+
+  console.log(lastQuestion);
 
   if (lastQuestion) {
     return new Response(

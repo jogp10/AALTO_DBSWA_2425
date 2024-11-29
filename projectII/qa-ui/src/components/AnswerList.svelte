@@ -12,7 +12,7 @@
   let ws;
 
   const fetchAnswers = async () => {
-    const answers = await fetch(`/api/questions/${questionId}/answers?page=${page}`);
+    const answers = await fetch(`/api/questions/${questionId}/answers?page=${page}&user_uuid=${$userUuid}`);
     newAnswers = await answers.json();
   };
 

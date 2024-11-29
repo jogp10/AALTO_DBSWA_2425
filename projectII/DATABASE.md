@@ -78,5 +78,5 @@ By carefully choosing indexes and denormalizing certain data, we can optimize th
 ### Method Call Caching
 
 - The `qaService` object is created by wrapping the `apiService` with a `cacheMethodCalls` function. This function caches the results of specific method calls to reduce the number of API requests and improve performance.
-- Flushing cache methods include: `upVote`, `addQuestion`, `addAnswer`, `deleteVote`, `saveGeneratedAnswers`, and `checkVote`.
+- Flushing cache methods include: `upVote`, `addQuestion`, `addAnswer`, `deleteVote`, `saveGeneratedAnswers`, `getLastAnswer` and `getLastQuestion`.
 - By flushing the cache for these methods, we ensure that the cache remains consistent with the database and that users see the most up-to-date information.
