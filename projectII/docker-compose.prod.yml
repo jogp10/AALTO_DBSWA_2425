@@ -54,9 +54,6 @@ services:
       dockerfile: Dockerfile.prod
     image: qa-ui-prod
     restart: "on-failure"
-    volumes:
-      - ./qa-ui/:/app
-      - astro_node_modules:/app/node_modules
     expose:
       - 3000
     depends_on:

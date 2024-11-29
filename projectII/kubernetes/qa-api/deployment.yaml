@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qa-api-deployment
+  namespace: qa-app
+  labels:
+    app: qa-api
+spec:
+  selector:
+    matchLabels:
+      app: qa-api
+  template:
+    metadata:
+      labels:
+        app: qa-api
+    spec:
+      containers:
+        - name: qa-api
+          image: qa-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 7777
+          resources:
+            requests: 
+              cpu: 100m
+            limits: 
+              cpu: 200m
+              memory: 512Mi
+          env:
+            - name: PGPASS
+              valueFrom:
+                secretKeyRef:
+                  name: database-cluster-app
+                  key: pgpass
+                  optional: false 
