@@ -33,16 +33,25 @@
 </script>
   
 {#await coursesPromise}
-    <p class="text-gray-500">Loading...</p>
+    <p id="loading-message" class="loading-message text-gray-500">Loading...</p>
 {:then courses}
-    <ul class="space-y-4">
+    <ul id="courses-list" class="courses-list space-y-4">
         {#each courses as course}
-            <li class="p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100">
-                <a href={`/course/${course.id}`} class="text-blue-500 hover:underline">{course.name}</a>
+            <li 
+                id={`course-${course.id}`} 
+                class="course-item p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100"
+            >
+                <a 
+                    href={`/course/${course.id}`} 
+                    id={`course-link-${course.id}`} 
+                    class="course-link text-blue-500 hover:underline"
+                >
+                    {course.name}
+                </a>
             </li>
         {/each}
     </ul>
 {:catch error}
-    <p class="text-red-500">{error.message}</p>
+    <p id="error-message" class="error-message text-red-500">{error.message}</p>
 {/await}
   

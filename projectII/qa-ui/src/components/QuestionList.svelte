@@ -83,15 +83,35 @@
   }
 </style>
 
-<ul class="space-y-4 my-1">
+<ul class="space-y-4 my-1" id="questions-list">
   {#each questions as question}
-  <li class="p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100">
-    <a href={`/question/${question.id}`} class="text-blue-500 hover:underline">{question.title}</a>
-    <p class="text-sm text-gray-700">{question.content}</p>
-    <p class="text-sm text-gray-500">Votes: {question.votes}</p>
+  <li 
+    id={`question-${question.id}`} 
+    class="question-item p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100"
+  >
+    <a 
+      href={`/question/${question.id}`} 
+      id={`question-link-${question.id}`} 
+      class="question-link text-blue-500 hover:underline"
+    >
+      {question.title}
+    </a>
+    <p 
+      id={`question-content-${question.id}`} 
+      class="question-content text-sm text-gray-700"
+    >
+      {question.content}
+    </p>
+    <p 
+      id={`question-votes-${question.id}`} 
+      class="question-votes text-sm text-gray-500"
+    >
+      Votes: {question.votes}
+    </p>
     <button 
+      id={`upvote-btn-${question.id}`} 
       on:click={() => handleUpvote(question.id)} 
-      class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="upvote-button px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       {#if question.upvoted}
         Downvote
@@ -102,9 +122,10 @@
   </li>
   {/each}
   <InfiniteScroll
-  hasMore={newQuestions.length}
-  threshold={100}
-  on:loadMore={() => {page++; fetchQuestions()}}
-  class="mt-4"
+    id="infinite-scroll"
+    hasMore={newQuestions.length}
+    threshold={100}
+    on:loadMore={() => {page++; fetchQuestions()}}
+    class="mt-4"
   />
 </ul>

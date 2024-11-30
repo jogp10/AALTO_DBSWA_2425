@@ -68,32 +68,38 @@
   }
 </style>
 
-<ul class="space-y-4 my-1">
+<ul id="answers-list" class="answers-list space-y-4 my-1">
   {#each answers as answer}
-    <li class="p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100 text-sm">
-      <p class="mb-2">{answer.content}</p>
-      <p class="mb-2">Votes: {answer.votes}</p>
+    <li 
+      id={`answer-${answer.id}`} 
+      class="answer-item p-4 border border-gray-300 rounded-md transition duration-200 ease-in-out hover:bg-gray-100 text-sm"
+    >
+      <p id={`answer-content-${answer.id}`} class="answer-content mb-2">{answer.content}</p>
+      <p id={`answer-votes-${answer.id}`} class="answer-votes mb-2">Votes: {answer.votes}</p>
       <button 
+        id={`upvote-btn-${answer.id}`}
         on:click={() => handleUpvote(answer.id)} 
-        class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="upvote-button px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
-      {#if answer.upvoted}
-        Downvote
-      {:else}
-        Upvote
-      {/if}
+        {#if answer.upvoted}
+          Downvote
+        {:else}
+          Upvote
+        {/if}
       </button>
       {#if answer.is_generated}
-        <p class="mt-2 text-gray-500">AI Generated answer</p>
+        <p id={`ai-generated-${answer.id}`} class="ai-generated mt-2 text-gray-500">AI Generated answer</p>
       {:else}
-        <p class="mt-2 text-gray-500">By {answer.user_uuid} at {answer.created_at}</p>
+        <p id={`answer-author-${answer.id}`} class="answer-author mt-2 text-gray-500">By {answer.user_uuid} at {answer.created_at}</p>
       {/if}
     </li>
   {/each}
   <InfiniteScroll
+    id="infinite-scroll-answers"
     hasMore={newAnswers.length}
     threshold={100}
     on:loadMore={() => {page++; fetchAnswers()}} 
     class="mt-4"
   />
 </ul>
+
