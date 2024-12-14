@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: llm-api-deployment
-  namespace: qa-app
+
   labels:
     app: llm-api
 spec:
@@ -21,8 +21,9 @@ spec:
           ports:
             - containerPort: 7000
           resources:
-            requests: 
-              cpu: 100m
-            limits: 
+            limits:
+              memory: 2Gi
               cpu: 200m
-              memory: 512Mi
+            requests:
+              memory: 1Gi
+              cpu: 200m

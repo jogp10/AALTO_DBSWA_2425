@@ -112,8 +112,6 @@ const handlePostQuestion = async (request, params) => {
   // Check if user has posted in last minute
   const lastQuestion = await qaService.getLastQuestion(data);
 
-  console.log(lastQuestion);
-
   if (lastQuestion) {
     return new Response(
       JSON.stringify({

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
-  namespace: qa-app
+
 spec:
   replicas: 1
   selector:
@@ -15,13 +15,27 @@ spec:
     spec:
       containers:
         - name: redis
-          image: redis:7.0
+          image: redis:latest
           ports:
             - containerPort: 6379
+          command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
           resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
             limits:
               memory: "512Mi"
               cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          volumeMounts:
+          - name: redis-config
+            mountPath: /usr/local/etc/redis/redis.conf
+            subPath: redis.conf
+          - name: redis-data
+            mountPath: /data
+      volumes:
+        - name: redis-config
+          configMap:
+            name: redis-config
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-pvc

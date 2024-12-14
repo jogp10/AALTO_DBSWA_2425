@@ -30,7 +30,6 @@
   };
 
   const subscribeToUpdates = async () => {
-    const host = window.location.hostname;
     ws = new WebSocket("/api/subscribe_updates");
 
     ws.onmessage = (event) => {

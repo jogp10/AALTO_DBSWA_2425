@@ -1,35 +1,10 @@
 <script>
-    import { onMount } from "svelte";
-
     const fetchCourses = async () => {
         const courses = await fetch("/api/courses");
         return await courses.json();
     };
 
     let coursesPromise = fetchCourses();
-
-    let eventSource;
-    const subscribeToUpdates = async () => {
-    eventSource = new EventSource("/api/subscribe_updates");
-    eventSource.onmessage = (event) => {
-      console.log("message", event.data);
-    };
-
-    eventSource.onerror = (event) => {
-      console.log(event);
-    };
-  };
-
-  onMount(()=> {
-    subscribeToUpdates();
-
-    return () => {
-      if (eventSource.readyState === 1) {
-        console.log('Closing event source');
-        eventSource.close();
-      }
-    };
-	})
 </script>
   
 {#await coursesPromise}

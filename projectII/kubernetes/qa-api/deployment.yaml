@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: qa-api-deployment
-  namespace: qa-app
+
   labels:
     app: qa-api
 spec:
@@ -33,3 +33,9 @@ spec:
                   name: database-cluster-app
                   key: pgpass
                   optional: false 
+            - name: REDIS_HOST
+              value: redis.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: LLM_API_URL
+              value: http://llm-api.svc.cluster.local:7000
